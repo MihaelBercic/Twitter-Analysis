@@ -4,27 +4,20 @@ import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations
 import edu.stanford.nlp.pipeline.StanfordCoreNLP
 import edu.stanford.nlp.sentiment.SentimentCoreAnnotations
 import edu.stanford.nlp.util.PropertiesUtils
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import twitter.Tweet
 import twitter.TwitterData
 import twitter.TwitterUsers
 import java.io.File
-import java.net.URL
 import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
 import java.util.*
 import kotlin.math.roundToInt
 import kotlin.system.exitProcess
 
-
-private const val token = "AAAAAAAAAAAAAAAAAAAAAAP0PgEAAAAAk9i4nfRk4P8E5bTZfFZitqXuliE%3Dj8gTw6qWoTW0qNm5YKOi28yrjBb5S0V5nSG5nIRTFGQ6OmM0xD"
-
 val properties: Properties = PropertiesUtils.asProperties("annotators", "tokenize, ssplit, parse, sentiment")
 val nlp = StanfordCoreNLP(properties)
-val httpClient = HttpClient.newHttpClient()
+val httpClient: HttpClient = HttpClient.newHttpClient()
 
 fun main() {
     val scanner = Scanner(System.`in`)
@@ -71,15 +64,6 @@ fun main() {
 }
 
 
-private val Int.asSentimentString
-    get() = when (this) {
-        0 -> "\u001b[31mVERY NEGATIVE\u001b[00m"
-        1 -> "\u001b[31mNEGATIVE\u001b[00m"
-        2 -> "\u001b[33mNEUTRAL\u001b[00m"
-        3 -> "\u001b[32mPOSITIVE\u001b[00m"
-        else -> "\u001b[32mVERY POSITIVE\u001b[00m"
-    }.padEnd(20, ' ')
-
 private fun retrieveTweets(username: String, amount: Int = 15): List<Tweet> {
     val userRequest = twitterRequest<TwitterUsers>("/users/by?usernames=$username")
     val firstUser = userRequest.data.firstOrNull() ?: throw Exception("User with the username $username does not exist.")
@@ -102,27 +86,4 @@ private fun retrieveTweets(username: String, amount: Int = 15): List<Tweet> {
     } while (tweets.size < amount)
     println("")
     return tweets
-}
-
-
-private inline fun <reified T> twitterRequest(endPoint: String): T {
-    val url = URL("https://api.twitter.com/2$endPoint")
-    try {
-        val request = HttpRequest
-            .newBuilder()
-            .uri(url.toURI())
-            .method("GET", HttpRequest.BodyPublishers.noBody())
-            .headers("Authorization", "Bearer $token", "Content-Type", "application/json")
-            .build()
-
-        val response = httpClient
-            .sendAsync(request, HttpResponse.BodyHandlers.ofString())
-            .get()
-
-        return Json { ignoreUnknownKeys = true }.decodeFromString(response.body())
-
-    } catch (e: Exception) {
-        e.printStackTrace()
-        throw e
-    }
 }
