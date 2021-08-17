@@ -1,3 +1,4 @@
+import analysis.Sentiment
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation
 import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations
 import edu.stanford.nlp.pipeline.StanfordCoreNLP
@@ -31,10 +32,11 @@ fun main() {
     val username = scanner.nextLine()
     print("How many tweets? ")
     val count = scanner.nextInt()
+
     val tweets = retrieveTweets(username, count)
 
     if (tweets.isEmpty()) {
-        println("Unable to fetch information regarding the user for whatever reason.")
+        println("Unable to fetch information.")
         exitProcess(1)
     }
 
@@ -68,7 +70,6 @@ fun main() {
 
 }
 
-data class Sentiment(val tweet: Tweet, val score: Int)
 
 private val Int.asSentimentString
     get() = when (this) {
@@ -114,9 +115,12 @@ private inline fun <reified T> twitterRequest(endPoint: String): T {
             .headers("Authorization", "Bearer $token", "Content-Type", "application/json")
             .build()
 
-        return httpClient
+        val response = httpClient
             .sendAsync(request, HttpResponse.BodyHandlers.ofString())
-            .get().let { Json.decodeFromString(it.body()) }
+            .get()
+
+        return Json { ignoreUnknownKeys = true }.decodeFromString(response.body())
+
     } catch (e: Exception) {
         e.printStackTrace()
         throw e
