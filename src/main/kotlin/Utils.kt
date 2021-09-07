@@ -21,7 +21,7 @@ val Int.asSentimentString
     }.padEnd(20, ' ')
 
 
-const val token = "AAAAAAAAAAAAAAAAAAAAAAP0PgEAAAAAk9i4nfRk4P8E5bTZfFZitqXuliE%3Dj8gTw6qWoTW0qNm5YKOi28yrjBb5S0V5nSG5nIRTFGQ6OmM0xD"
+const val token = ""
 
 /** Performs HTTP GET request to twitter API using [token] for authentication. */
 inline fun <reified T> twitterRequest(endPoint: String): T {
