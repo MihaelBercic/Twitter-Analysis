@@ -63,7 +63,7 @@ fun main() {
 
 }
 
-
+/** Retrieves [amount] of tweets by [username] from twitter.com */
 private fun retrieveTweets(username: String, amount: Int = 15): List<Tweet> {
     val userRequest = twitterRequest<TwitterUsers>("/users/by?usernames=$username")
     val firstUser = userRequest.data.firstOrNull() ?: throw Exception("User with the username $username does not exist.")

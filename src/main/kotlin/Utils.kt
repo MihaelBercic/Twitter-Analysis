@@ -10,6 +10,7 @@ import java.net.http.HttpResponse
  * using IntelliJ IDEA
  */
 
+/** Returns colored word for console output based. */
 val Int.asSentimentString
     get() = when (this) {
         0 -> "\u001b[31mVERY NEGATIVE\u001b[00m"
@@ -22,7 +23,7 @@ val Int.asSentimentString
 
 const val token = "AAAAAAAAAAAAAAAAAAAAAAP0PgEAAAAAk9i4nfRk4P8E5bTZfFZitqXuliE%3Dj8gTw6qWoTW0qNm5YKOi28yrjBb5S0V5nSG5nIRTFGQ6OmM0xD"
 
-
+/** Performs HTTP GET request to twitter API using [token] for authentication. */
 inline fun <reified T> twitterRequest(endPoint: String): T {
     val url = URL("https://api.twitter.com/2$endPoint")
     try {
